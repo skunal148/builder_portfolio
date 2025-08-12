@@ -42,8 +42,8 @@ export default function Dashboard() {
                 <h3>{p.title || p.templateName || "Untitled Portfolio"}</h3>
                 <p className="text-muted mb-3">Template: {p.templateId || "unknown"}</p>
                 <div style={{ display: "flex", gap: ".5rem" }}>
-                  <button className="btn btn-secondary">Edit</button>
-                  <button className="btn">View</button>
+                  <Link className="btn btn-secondary" to={`/editor/portfolio/${p.id}`}>Edit</Link>
+                  <Link className="btn" to={`/view/${p.id}`}>View</Link>
                 </div>
               </div>
             ))}

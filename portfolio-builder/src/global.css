@@ -149,4 +149,22 @@ textarea:focus {
 /* Links */
 a { color: var(--primary-color); text-decoration: none; }
 a:hover { color: var(--primary-color-600); }
+
+/* Modal / Toast */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: grid;
+  place-items: center;
+  z-index: 50;
+}
+.modal {
+  background: var(--surface-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  padding: 1.25rem;
+  width: min(520px, 92vw);
+}
+.modal-actions { display: flex; gap: .5rem; justify-content: flex-end; margin-top: .75rem; }
   
