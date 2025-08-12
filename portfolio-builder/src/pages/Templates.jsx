@@ -13,6 +13,7 @@ export default function Templates() {
             <div key={t.id} className="template-card">
               <div className="preview" />
               <h3>{t.name}</h3>
+              {t.customizable && <p className="text-muted">Customizable</p>}
               <Link className="btn mt-3 btn-block" to={`/editor/${t.id}`}>Use Template</Link>
             </div>
           ))}

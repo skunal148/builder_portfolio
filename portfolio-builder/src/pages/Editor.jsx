@@ -15,6 +15,7 @@ export default function Editor() {
   const [title, setTitle] = useState(template ? `${template.name} Portfolio` : "Untitled Portfolio");
   const [showSaved, setShowSaved] = useState(false);
   const [lastSavedId, setLastSavedId] = useState(portfolioId || null);
+  const [theme, setTheme] = useState(() => template?.theme || { accent: "#4a90e2", radius: 12, font: "system-ui" });
 
   // If we are editing an existing portfolio, load it
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function Editor() {
                     templateId: templateId || "custom",
                     title,
                     sections,
+                    theme,
                     createdAt: serverTimestamp(),
                     updatedAt: Date.now(),
                   });
@@ -66,6 +68,7 @@ export default function Editor() {
                     templateId: templateId || "custom",
                     title,
                     sections,
+                    theme,
                     updatedAt: Date.now(),
                   }, { merge: true });
                 }
@@ -86,6 +89,14 @@ export default function Editor() {
               <label>title</label>
               <input value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
+            {template?.customizable && (
+              <div className="card" style={{ marginTop: "1rem" }}>
+                <h4 className="mb-3">Theme</h4>
+                <div className="form-row"><label>accent</label><input type="color" value={theme.accent} onChange={(e) => setTheme({ ...theme, accent: e.target.value })} /></div>
+                <div className="form-row"><label>font</label><input value={theme.font} onChange={(e) => setTheme({ ...theme, font: e.target.value })} /></div>
+                <div className="form-row"><label>radius</label><input type="number" value={theme.radius} onChange={(e) => setTheme({ ...theme, radius: Number(e.target.value) })} /></div>
+              </div>
+            )}
             {sections.map((s, idx) => (
               <div key={idx} className="form-row" style={{ marginTop: "0.75rem" }}>
                 <strong style={{ display: "block" }}>{s.type}</strong>
@@ -135,7 +146,11 @@ export default function Editor() {
             ))}
           </section>
 
-          <section className="card">
+          <section className="card" style={{
+            ["--primary-color"]: theme.accent,
+            ["--border-radius"]: `${theme.radius}px`,
+            fontFamily: theme.font,
+          }}>
             <h3>Preview</h3>
             <div style={{ marginTop: "0.75rem" }}>
               {sections.map((s, idx) => (
