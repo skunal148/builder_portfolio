@@ -3,6 +3,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import Navbar from "../components/Navbar";
 import { Link } from "react-router-dom";
+import { deleteDoc, doc } from "firebase/firestore";
 
 export default function Dashboard() {
   const [portfolios, setPortfolios] = useState([]);
@@ -39,7 +40,21 @@ export default function Dashboard() {
             {portfolios.map((p) => (
               <div key={p.id} className="template-card">
                 <div className="preview" />
-                <h3>{p.title || p.templateName || "Untitled Portfolio"}</h3>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.5rem' }}>
+                  <h3 style={{ margin: 0 }}>{p.title || p.templateName || "Untitled Portfolio"}</h3>
+                  <button
+                    aria-label="Delete portfolio"
+                    title="Delete"
+                    className="btn btn-secondary"
+                    onClick={async () => {
+                      const confirmDelete = confirm('Delete this portfolio? This cannot be undone.');
+                      if (!confirmDelete) return;
+                      await deleteDoc(doc(db, 'portfolios', p.id));
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
                 <p className="text-muted mb-3">Template: {p.templateId || "unknown"}</p>
                 <div style={{ display: "flex", gap: ".5rem" }}>
                   <Link className="btn btn-secondary" to={`/editor/portfolio/${p.id}`}>Edit</Link>

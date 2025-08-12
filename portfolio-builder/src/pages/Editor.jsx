@@ -93,7 +93,17 @@ export default function Editor() {
               <div className="card" style={{ marginTop: "1rem" }}>
                 <h4 className="mb-3">Theme</h4>
                 <div className="form-row"><label>accent</label><input type="color" value={theme.accent} onChange={(e) => setTheme({ ...theme, accent: e.target.value })} /></div>
-                <div className="form-row"><label>font</label><input value={theme.font} onChange={(e) => setTheme({ ...theme, font: e.target.value })} /></div>
+                <div className="form-row"><label>font</label>
+                  <select value={theme.font} onChange={(e) => setTheme({ ...theme, font: e.target.value })}>
+                    <option value="system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif">System UI</option>
+                    <option value="Inter, system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif">Inter</option>
+                    <option value="Poppins, system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif">Poppins</option>
+                    <option value="Nunito, system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif">Nunito</option>
+                    <option value="Roboto, system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif">Roboto</option>
+                    <option value="Georgia, Times, 'Times New Roman', serif">Georgia (Serif)</option>
+                    <option value="JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">Mono</option>
+                  </select>
+                </div>
                 <div className="form-row"><label>radius</label><input type="number" value={theme.radius} onChange={(e) => setTheme({ ...theme, radius: Number(e.target.value) })} /></div>
               </div>
             )}
