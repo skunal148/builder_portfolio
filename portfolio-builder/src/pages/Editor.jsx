@@ -16,6 +16,7 @@ export default function Editor() {
   const [showSaved, setShowSaved] = useState(false);
   const [lastSavedId, setLastSavedId] = useState(portfolioId || null);
   const [theme, setTheme] = useState(() => template?.theme || { accent: "#4a90e2", radius: 12, font: "system-ui" });
+  const [isCustomizable, setIsCustomizable] = useState(!!template?.customizable);
 
   // If we are editing an existing portfolio, load it
   useEffect(() => {
@@ -25,8 +26,31 @@ export default function Editor() {
       const snap = await getDoc(ref);
       if (snap.exists()) {
         const data = snap.data();
-        setSections(Array.isArray(data.sections) ? data.sections : []);
+        let loadedSections = Array.isArray(data.sections) ? data.sections : [];
+        // Derive template for existing portfolio to decide on missing sections
+        const tmpl = getTemplateById(data.templateId);
+        setIsCustomizable(!!tmpl?.customizable);
+        // Ensure skills section exists for older portfolios
+        if (tmpl) {
+          const hasSkills = loadedSections.some((s) => s.type === "skills");
+          if (!hasSkills) {
+            const skillsBlock = (tmpl.blocks || []).find((b) => b.type === "skills");
+            const skillsSection = skillsBlock ? { type: "skills", data: { ...skillsBlock.defaultData } } : { type: "skills", data: { items: [] } };
+            const heroIndex = loadedSections.findIndex((s) => s.type === "hero");
+            if (heroIndex >= 0) {
+              loadedSections = [
+                ...loadedSections.slice(0, heroIndex + 1),
+                skillsSection,
+                ...loadedSections.slice(heroIndex + 1),
+              ];
+            } else {
+              loadedSections = [skillsSection, ...loadedSections];
+            }
+          }
+        }
+        setSections(loadedSections);
         setTitle(data.title || "Untitled Portfolio");
+        if (data.theme) setTheme(data.theme);
       }
     };
     load();
@@ -89,7 +113,7 @@ export default function Editor() {
               <label>title</label>
               <input value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
-            {template?.customizable && (
+            {isCustomizable && (
               <div className="card" style={{ marginTop: "1rem" }}>
                 <h4 className="mb-3">Theme</h4>
                 <div className="form-row"><label>accent</label><input type="color" value={theme.accent} onChange={(e) => setTheme({ ...theme, accent: e.target.value })} /></div>
@@ -130,6 +154,11 @@ export default function Editor() {
                         <SocialsEditor
                           items={Array.isArray(value) ? value : []}
                           onChange={(items) => handleChange(idx, "socials", items)}
+                        />
+                      ) : s.type === "skills" && field === "items" ? (
+                        <SkillsEditor
+                          items={Array.isArray(value) ? value : []}
+                          onChange={(items) => handleChange(idx, "items", items)}
                         />
                       ) : s.type === "experience" && field === "items" ? (
                         <ExperienceEditor
@@ -178,6 +207,16 @@ export default function Editor() {
                           ))}
                         </p>
                       )}
+                    </div>
+                  )}
+                  {s.type === "skills" && (
+                    <div>
+                      <h3>Skills</h3>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        {(Array.isArray(s.data.items) ? s.data.items : []).map((sk, i) => (
+                          <span key={i} style={{ padding: '6px 10px', background: '#eef2f7', borderRadius: 999, fontSize: 13 }}>{sk}</span>
+                        ))}
+                      </div>
                     </div>
                   )}
                   {s.type === "projectsGrid" && (
@@ -551,6 +590,32 @@ function SocialsEditor({ items, onChange }) {
         </div>
       ))}
       <button type="button" className="btn mt-3" onClick={addItem}>Add social link</button>
+    </div>
+  );
+}
+
+function SkillsEditor({ items, onChange }) {
+  const [input, setInput] = useState("");
+  const addSkill = () => {
+    const v = input.trim();
+    if (!v) return;
+    onChange([...(items || []), v]);
+    setInput("");
+  };
+  const removeSkill = (i) => onChange(items.filter((_, idx) => idx !== i));
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Add a skill" />
+        <button type="button" className="btn" onClick={addSkill}>Add</button>
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+        {(items || []).map((sk, i) => (
+          <span key={i} style={{ padding: '6px 10px', background: '#eef2f7', borderRadius: 999, fontSize: 13 }}>
+            {sk} <button type="button" className="btn btn-secondary" style={{ marginLeft: 6, padding: '2px 6px' }} onClick={() => removeSkill(i)}>✕</button>
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

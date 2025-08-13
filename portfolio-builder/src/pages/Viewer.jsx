@@ -25,7 +25,9 @@ export default function Viewer() {
           <p className="text-muted">Loading...</p>
         ) : (
           <article className="card">
-            <h1 style={{ marginBottom: ".5rem" }}>{data.title || "Portfolio"}</h1>
+            {!(data.templateId === 'blank' && (data.title || '').toLowerCase().includes('blank')) && (
+              <h1 style={{ marginBottom: ".5rem" }}>{data.title || "Portfolio"}</h1>
+            )}
             {(Array.isArray(data.sections) ? data.sections : []).map((s, idx) => (
               <section key={idx} style={{ marginTop: "1rem" }}>
                 {s.type === "hero" && (
@@ -41,6 +43,16 @@ export default function Viewer() {
                         ))}
                       </p>
                     )}
+                  </div>
+                )}
+                {s.type === "skills" && (
+                  <div>
+                    <h3>Skills</h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {(Array.isArray(s.data.items) ? s.data.items : []).map((sk, i) => (
+                        <span key={i} style={{ padding: '6px 10px', background: '#eef2f7', borderRadius: 999, fontSize: 13 }}>{sk}</span>
+                      ))}
+                    </div>
                   </div>
                 )}
                 {s.type === "experience" && (

@@ -59,4 +59,12 @@ export const certificationsBlock = {
   },
 };
 
+export const skillsBlock = {
+  type: "skills",
+  label: "Skills",
+  defaultData: {
+    items: ["JavaScript", "React", "Node.js"],
+  },
+};
+
 
